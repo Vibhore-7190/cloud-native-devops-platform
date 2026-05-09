@@ -4,7 +4,7 @@
 
 > A production-grade, cloud-native DevOps platform on AWS — fully automated from infrastructure provisioning to deployment and observability.
 
-**Author:** Amitabh Das · DevOps Engineer II, Capgemini Engineering · [linkedin.com/in/iamitabh07](https://linkedin.com/in/iamitabh07)
+**Author:** Amitabh Das · DevOps Engineer II, Capgemini Engineering · [linkedin.com/in/amitabhdas-devops](https://www.linkedin.com/in/amitabhdas-devops/)
 
 ---
 
