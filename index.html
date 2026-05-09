@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cloud-Native DevOps Platform — Amitabh Das</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080b10;
+  --bg2: #0d1117;
+  --bg3: #111620;
+  --surface: #141921;
+  --border: #1e2736;
+  --border2: #243044;
+  --text: #cdd6f4;
+  --dim: #6c7a99;
+  --dim2: #4a5568;
+  --green: #a6e3a1;
+  --green2: #40a870;
+  --blue: #89b4fa;
+  --blue2: #4a7fd4;
+  --teal: #94e2d5;
+  --yellow: #f9e2af;
+  --orange: #fab387;
+  --purple: #cba6f7;
+  --red: #f38ba8;
+  --pink: #f5c2e7;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Bricolage Grotesque', sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ── NOISE TEXTURE OVERLAY ─────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity: 0.4;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── GRID BACKGROUND ───────────────────────────────────── */
+.grid-bg {
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(137,180,250,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(137,180,250,0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── GLOW ORBS ─────────────────────────────────────────── */
+.orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 0;
+}
+.orb-1 { width: 500px; height: 500px; background: rgba(74,127,212,0.08); top: -100px; left: -100px; }
+.orb-2 { width: 400px; height: 400px; background: rgba(166,227,161,0.06); bottom: 100px; right: -100px; }
+.orb-3 { width: 300px; height: 300px; background: rgba(203,166,247,0.05); top: 50%; left: 50%; transform: translate(-50%,-50%); }
+
+/* ── LAYOUT ────────────────────────────────────────────── */
+.wrap { position: relative; z-index: 1; max-width: 1000px; margin: 0 auto; padding: 0 24px; }
+
+/* ── NAV ───────────────────────────────────────────────── */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid var(--border);
+  background: rgba(8,11,16,0.85);
+  backdrop-filter: blur(20px);
+}
+.nav-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nav-logo {
+  font-family: 'Geist Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--green);
+  letter-spacing: 0.5px;
+}
+.nav-links { display: flex; gap: 24px; }
+.nav-links a {
+  font-size: 12px;
+  color: var(--dim);
+  text-decoration: none;
+  font-family: 'Geist Mono', monospace;
+  transition: color .2s;
+}
+.nav-links a:hover { color: var(--text); }
+.nav-gh {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Geist Mono', monospace;
+  color: var(--bg);
+  background: var(--green);
+  padding: 5px 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: opacity .2s;
+}
+.nav-gh:hover { opacity: 0.85; }
+
+/* ── HERO ──────────────────────────────────────────────── */
+.hero {
+  padding: 80px 0 60px;
+  border-bottom: 1px solid var(--border);
+}
+.hero-label {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  color: var(--green2);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.hero-label::before { content: ''; width: 24px; height: 1px; background: var(--green2); }
+
+.hero-title {
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+  color: #f0f4ff;
+  margin-bottom: 20px;
+}
+.hero-title span { color: var(--green); }
+
+.hero-desc {
+  font-size: 16px;
+  color: var(--dim);
+  max-width: 580px;
+  line-height: 1.7;
+  margin-bottom: 28px;
+  font-weight: 400;
+}
+
+.hero-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
+.tag {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 11px;
+  border-radius: 5px;
+  border: 1px solid;
+}
+.tag-green { color: var(--green); border-color: rgba(166,227,161,0.25); background: rgba(166,227,161,0.06); }
+.tag-blue  { color: var(--blue);  border-color: rgba(137,180,250,0.25); background: rgba(137,180,250,0.06); }
+.tag-purple{ color: var(--purple);border-color: rgba(203,166,247,0.25); background: rgba(203,166,247,0.06); }
+.tag-teal  { color: var(--teal);  border-color: rgba(148,226,213,0.25); background: rgba(148,226,213,0.06); }
+.tag-orange{ color: var(--orange);border-color: rgba(250,179,135,0.25); background: rgba(250,179,135,0.06); }
+.tag-yellow{ color: var(--yellow);border-color: rgba(249,226,175,0.25); background: rgba(249,226,175,0.06); }
+
+.hero-meta {
+  font-size: 13px;
+  color: var(--dim2);
+  font-family: 'Geist Mono', monospace;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.hero-meta a { color: var(--blue); text-decoration: none; }
+.hero-meta a:hover { color: var(--text); }
+.sep { color: var(--dim2); }
+
+/* ── METRICS GRID ──────────────────────────────────────── */
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  margin: 48px 0;
+}
+.metric {
+  background: var(--surface);
+  padding: 28px 24px;
+  text-align: center;
+  position: relative;
+  transition: background .2s;
+}
+.metric:hover { background: var(--bg3); }
+.metric::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 40px; height: 1px;
+  background: var(--green2);
+  opacity: 0;
+  transition: opacity .2s;
+}
+.metric:hover::after { opacity: 1; }
+.m-val {
+  font-family: 'Geist Mono', monospace;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--green);
+  line-height: 1;
+  margin-bottom: 8px;
+  letter-spacing: -1px;
+}
+.m-lbl { font-size: 12px; color: var(--dim); font-weight: 500; }
+
+/* ── SECTION HEADERS ───────────────────────────────────── */
+.sec-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+  padding-top: 56px;
+}
+.sec-num {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  color: var(--dim2);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  padding: 2px 7px;
+  flex-shrink: 0;
+}
+.sec-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #f0f4ff;
+  letter-spacing: -0.5px;
+}
+.sec-line { flex: 1; height: 1px; background: var(--border); }
+
+/* ── ARCHITECTURE ──────────────────────────────────────── */
+.arch-wrap {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  overflow-x: auto;
+  margin-bottom: 56px;
+}
+
+svg.arch { display: block; width: 100%; height: auto; min-width: 760px; }
+
+/* ── STACK TABLE ───────────────────────────────────────── */
+.stack-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 56px;
+}
+.stack-row {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  background: var(--surface);
+  gap: 0;
+  transition: background .15s;
+}
+.stack-row:hover { background: var(--bg3); }
+.stack-cat {
+  padding: 14px 16px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--dim);
+  border-right: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+.stack-val {
+  padding: 14px 16px;
+  font-size: 13px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.chip {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid;
+}
+
+/* ── FILE TREE ─────────────────────────────────────────── */
+.tree-wrap {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 56px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 13px;
+  line-height: 1.9;
+}
+.tree-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 20px;
+  font-size: 11px;
+  color: var(--dim);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tree-dot { width: 10px; height: 10px; border-radius: 50%; }
+.td-red { background: #f38ba8; }
+.td-yellow { background: #f9e2af; }
+.td-green { background: #a6e3a1; }
+.tree-body { padding: 20px 24px; overflow-x: auto; }
+.t-root { color: var(--blue); font-weight: 700; }
+.t-dir { color: var(--blue); font-weight: 500; }
+.t-file { color: var(--text); }
+.t-new { color: var(--green); }
+.t-cmt { color: var(--dim2); font-style: italic; }
+.t-arrow { color: var(--dim2); }
+
+/* ── CODE BLOCK ────────────────────────────────────────── */
+.code-wrap {
+  background: #010409;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 56px;
+}
+.code-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 18px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  color: var(--dim);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.copy-btn {
+  background: rgba(166,227,161,.1);
+  border: 1px solid rgba(166,227,161,.2);
+  color: var(--green);
+  border-radius: 5px;
+  padding: 3px 10px;
+  font-size: 10px;
+  font-family: 'Geist Mono', monospace;
+  cursor: pointer;
+  transition: all .2s;
+}
+.copy-btn:hover { background: rgba(166,227,161,.18); }
+.copy-btn.ok { border-color: var(--green); }
+pre {
+  padding: 20px 24px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 12.5px;
+  line-height: 1.75;
+  color: var(--text);
+  overflow-x: auto;
+  margin: 0;
+}
+.kw { color: #f38ba8; }
+.str { color: #a6e3a1; }
+.cm { color: #45475a; font-style: italic; }
+.nm { color: #89b4fa; }
+.fn { color: #cba6f7; }
+.nu { color: #f9e2af; }
+.gt { color: #a6e3a1; font-weight: 600; }
+
+/* ── OUTCOMES TABLE ────────────────────────────────────── */
+.outcomes {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 56px;
+}
+.out-head {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.out-th {
+  padding: 12px 20px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--dim);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.out-th:first-child { border-right: 1px solid var(--border); }
+.out-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+  transition: background .15s;
+}
+.out-row:last-child { border-bottom: none; }
+.out-row:hover { background: var(--surface); }
+.out-cell {
+  padding: 14px 20px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.out-cell:first-child {
+  border-right: 1px solid var(--border);
+  color: var(--dim);
+  font-family: 'Geist Mono', monospace;
+  font-size: 12px;
+}
+.out-cell:last-child { color: var(--text); font-weight: 500; }
+.out-accent { color: var(--green); font-weight: 700; font-family: 'Geist Mono', monospace; font-size: 15px; }
+
+/* ── FOOTER ────────────────────────────────────────────── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 32px 0;
+  margin-top: 40px;
+}
+.footer-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.footer-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: #f0f4ff;
+}
+.footer-links { display: flex; gap: 16px; }
+.footer-links a {
+  font-family: 'Geist Mono', monospace;
+  font-size: 12px;
+  color: var(--blue);
+  text-decoration: none;
+}
+.footer-links a:hover { color: var(--text); }
+
+/* ── ANIMATIONS ────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.hero-label { animation: fadeUp .5s ease both; }
+.hero-title { animation: fadeUp .5s .1s ease both; }
+.hero-desc  { animation: fadeUp .5s .2s ease both; }
+.hero-tags  { animation: fadeUp .5s .3s ease both; }
+.hero-meta  { animation: fadeUp .5s .4s ease both; }
+.metrics    { animation: fadeUp .6s .5s ease both; }
+
+@media (max-width: 700px) {
+  .metrics { grid-template-columns: 1fr 1fr; }
+  .stack-grid { grid-template-columns: 1fr; }
+  .nav-links { display: none; }
+  .out-head, .out-row { grid-template-columns: 1fr; }
+  .out-cell:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+}
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">~/cloud-native-devops-platform</div>
+    <div class="nav-links">
+      <a href="#architecture">Architecture</a>
+      <a href="#stack">Stack</a>
+      <a href="#structure">Structure</a>
+      <a href="#quickstart">Quick Start</a>
+    </div>
+    <a class="nav-gh" href="https://github.com/iamitabh07/cloud-native-devops-platform" target="_blank">
+      ⭐ Star on GitHub
+    </a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-label">Production-Grade · Open Source</div>
+    <h1 class="hero-title">Cloud-Native<br><span>DevOps Platform</span></h1>
+    <p class="hero-desc">
+      Fully automated AWS infrastructure — from Terraform provisioning to GitOps deployment and SLI/SLO-aligned observability. Built to demonstrate real-world SRE practices at production scale.
+    </p>
+    <div class="hero-tags">
+      <span class="tag tag-orange">AWS EKS</span>
+      <span class="tag tag-purple">Terraform</span>
+      <span class="tag tag-blue">ArgoCD / GitOps</span>
+      <span class="tag tag-green">Prometheus + Grafana</span>
+      <span class="tag tag-teal">Kubernetes</span>
+      <span class="tag tag-yellow">Jenkins · GitHub Actions</span>
+      <span class="tag tag-blue">Helm + Istio</span>
+      <span class="tag tag-green">DevSecOps</span>
+    </div>
+    <div class="hero-meta">
+      <span>Amitabh Das</span>
+      <span class="sep">·</span>
+      <span>DevOps Engineer II, Capgemini Engineering</span>
+      <span class="sep">·</span>
+      <a href="https://linkedin.com/in/iamitabh07">linkedin.com/in/iamitabh07</a>
+      <span class="sep">·</span>
+      <span>MIT License</span>
+    </div>
+  </div>
+
+  <!-- METRICS -->
+  <div class="metrics">
+    <div class="metric">
+      <div class="m-val">~35%</div>
+      <div class="m-lbl">MTTD reduction</div>
+    </div>
+    <div class="metric">
+      <div class="m-val">40%</div>
+      <div class="m-lbl">Provisioning effort cut</div>
+    </div>
+    <div class="metric">
+      <div class="m-val">30%</div>
+      <div class="m-lbl">Faster deployments</div>
+    </div>
+    <div class="metric">
+      <div class="m-val">99.95%</div>
+      <div class="m-lbl">Uptime SLA target</div>
+    </div>
+  </div>
+
+  <!-- KEY OUTCOMES TABLE -->
+  <div class="sec-header" id="outcomes">
+    <span class="sec-num">01</span>
+    <span class="sec-title">Key Outcomes</span>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="outcomes">
+    <div class="out-head">
+      <div class="out-th">Metric</div>
+      <div class="out-th">Result</div>
+    </div>
+    <div class="out-row">
+      <div class="out-cell">MTTD reduction</div>
+      <div class="out-cell"><span class="out-accent">~35%</span> via burn-rate alerting aligned to SLOs</div>
+    </div>
+    <div class="out-row">
+      <div class="out-cell">Provisioning effort</div>
+      <div class="out-cell"><span class="out-accent">40%</span> reduction via modular, reusable Terraform</div>
+    </div>
+    <div class="out-row">
+      <div class="out-cell">Deployment speed</div>
+      <div class="out-cell"><span class="out-accent">30%</span> faster via ArgoCD GitOps automation</div>
+    </div>
+    <div class="out-row">
+      <div class="out-cell">Uptime SLA target</div>
+      <div class="out-cell"><span class="out-accent">99.95%</span> via multi-AZ HA architecture</div>
+    </div>
+    <div class="out-row">
+      <div class="out-cell">Manual overhead</div>
+      <div class="out-cell"><span class="out-accent">~50%</span> cut via Python + Bash automation</div>
+    </div>
+    <div class="out-row">
+      <div class="out-cell">Drift tolerance</div>
+      <div class="out-cell"><span class="out-accent">Zero</span> — enforced via automated drift detection pipeline</div>
+    </div>
+  </div>
+
+  <!-- ARCHITECTURE -->
+  <div class="sec-header" id="architecture">
+    <span class="sec-num">02</span>
+    <span class="sec-title">Architecture</span>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="arch-wrap">
+    <svg class="arch" viewBox="0 0 900 560" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="a1" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+          <polygon points="0 0,7 2.5,0 5" fill="#89b4fa" opacity=".8"/>
+        </marker>
+        <marker id="a2" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+          <polygon points="0 0,7 2.5,0 5" fill="#a6e3a1" opacity=".9"/>
+        </marker>
+        <marker id="a3" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+          <polygon points="0 0,7 2.5,0 5" fill="#cba6f7" opacity=".7"/>
+        </marker>
+        <marker id="a4" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+          <polygon points="0 0,7 2.5,0 5" fill="#94e2d5" opacity=".7"/>
+        </marker>
+        <filter id="glow2">
+          <feGaussianBlur stdDeviation="3" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <!-- Zone: Developer -->
+      <rect x="10" y="12" width="140" height="100" rx="8" fill="none" stroke="#1e2736" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="80" y="28" text-anchor="middle" fill="#45475a" font-size="9" font-family="Geist Mono, monospace" letter-spacing="1">DEVELOPER</text>
+
+      <!-- Zone: CI -->
+      <rect x="168" y="12" width="200" height="100" rx="8" fill="none" stroke="#1e2736" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="268" y="28" text-anchor="middle" fill="#45475a" font-size="9" font-family="Geist Mono, monospace" letter-spacing="1">CI PIPELINE</text>
+
+      <!-- Zone: GitOps/CD -->
+      <rect x="386" y="12" width="200" height="100" rx="8" fill="none" stroke="#243044" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="486" y="28" text-anchor="middle" fill="#4a7fd4" font-size="9" font-family="Geist Mono, monospace" letter-spacing="1">GITOPS / CD</text>
+
+      <!-- Zone: IaC -->
+      <rect x="604" y="12" width="130" height="100" rx="8" fill="none" stroke="#2d1f4a" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="669" y="28" text-anchor="middle" fill="#7c5cbf" font-size="9" font-family="Geist Mono, monospace" letter-spacing="1">IaC</text>
+
+      <!-- Nodes row 1 -->
+      <!-- Developer -->
+      <rect x="22" y="38" width="116" height="54" rx="7" fill="#0d1117" stroke="#1e2736" stroke-width="1.2"/>
+      <text x="80" y="58" text-anchor="middle" fill="#cdd6f4" font-size="12" font-family="Geist Mono,monospace" font-weight="600">Developer</text>
+      <text x="80" y="74" text-anchor="middle" fill="#6c7a99" font-size="9" font-family="Geist Mono,monospace">git push → PR</text>
+
+      <!-- GitHub -->
+      <rect x="180" y="36" width="80" height="54" rx="7" fill="#0d1117" stroke="#1e2736" stroke-width="1.2"/>
+      <text x="220" y="58" text-anchor="middle" fill="#cdd6f4" font-size="11" font-family="Geist Mono,monospace" font-weight="600">GitHub</text>
+      <text x="220" y="74" text-anchor="middle" fill="#6c7a99" font-size="9" font-family="Geist Mono,monospace">source + IaC</text>
+
+      <!-- Jenkins -->
+      <rect x="274" y="36" width="84" height="54" rx="7" fill="#111a27" stroke="#89b4fa" stroke-width="1.3" filter="url(#glow2)"/>
+      <text x="316" y="58" text-anchor="middle" fill="#89b4fa" font-size="11" font-family="Geist Mono,monospace" font-weight="600">Jenkins</text>
+      <text x="316" y="74" text-anchor="middle" fill="#6c7a99" font-size="9" font-family="Geist Mono,monospace">build/test/scan</text>
+
+      <!-- ArgoCD -->
+      <rect x="400" y="36" width="84" height="54" rx="7" fill="#0d1a12" stroke="#a6e3a1" stroke-width="1.5" filter="url(#glow2)"/>
+      <text x="442" y="58" text-anchor="middle" fill="#a6e3a1" font-size="11" font-family="Geist Mono,monospace" font-weight="600">ArgoCD</text>
+      <text x="442" y="74" text-anchor="middle" fill="#6c7a99" font-size="9" font-family="Geist Mono,monospace">GitOps CD</text>
+
+      <!-- ECR -->
+      <rect x="498" y="36" width="80" height="54" rx="7" fill="#0d1117" stroke="#1e2736" stroke-width="1.2"/>
+      <text x="538" y="54" text-anchor="middle" fill="#cdd6f4" font-size="10" font-family="Geist Mono,monospace" font-weight="600">ECR</text>
+      <text x="538" y="67" text-anchor="middle" fill="#6c7a99" font-size="9" font-family="Geist Mono,monospace">container</text>
+      <text x="538" y="80" text-anchor="middle" fill="#6c7a99" font-size="9" font-family="Geist Mono,monospace">registry</text>
+
+      <!-- Terraform -->
+      <rect x="616" y="36" width="106" height="54" rx="7" fill="#180f2b" stroke="#cba6f7" stroke-width="1.2"/>
+      <text x="669" y="58" text-anchor="middle" fill="#cba6f7" font-size="11" font-family="Geist Mono,monospace" font-weight="600">Terraform</text>
+      <text x="669" y="74" text-anchor="middle" fill="#6c7a99" font-size="9" font-family="Geist Mono,monospace">IaC provision</text>
+
+      <!-- AWS CLOUD zone -->
+      <rect x="10" y="130" width="875" height="285" rx="10" fill="rgba(250,179,135,0.02)" stroke="#2a1e00" stroke-width="1.5" stroke-dasharray="5,4"/>
+      <text x="448" y="150" text-anchor="middle" fill="#fab387" font-size="10" font-family="Geist Mono,monospace" font-weight="600" letter-spacing="2">AWS CLOUD</text>
+
+      <!-- VPC box -->
+      <rect x="22" y="160" width="440" height="240" rx="8" fill="rgba(250,179,135,0.025)" stroke="#2a1800" stroke-width="1" stroke-dasharray="3,3"/>
+      <text x="242" y="178" text-anchor="middle" fill="#fab387" font-size="9" font-family="Geist Mono,monospace">VPC (10.0.0.0/16)</text>
+
+      <!-- EKS Cluster box -->
+      <rect x="36" y="186" width="412" height="195" rx="7" fill="rgba(137,180,250,0.03)" stroke="#1e3060" stroke-width="1"/>
+      <text x="242" y="202" text-anchor="middle" fill="#89b4fa" font-size="9" font-family="Geist Mono,monospace">EKS CLUSTER (multi-AZ)</text>
+
+      <!-- ns: production -->
+      <rect x="50" y="212" width="180" height="72" rx="5" fill="rgba(166,227,161,0.05)" stroke="#1a3a20" stroke-width="1"/>
+      <text x="140" y="227" text-anchor="middle" fill="#a6e3a1" font-size="9" font-family="Geist Mono,monospace">ns: production</text>
+      <rect x="60" y="233" width="70" height="26" rx="4" fill="#0d1117" stroke="#1e2736" stroke-width="1"/>
+      <text x="95" y="250" text-anchor="middle" fill="#cdd6f4" font-size="9" font-family="Geist Mono,monospace">app pods</text>
+      <rect x="138" y="233" width="82" height="26" rx="4" fill="#0d1117" stroke="#1e2736" stroke-width="1"/>
+      <text x="179" y="250" text-anchor="middle" fill="#cdd6f4" font-size="9" font-family="Geist Mono,monospace">StatefulSets</text>
+
+      <!-- ns: staging -->
+      <rect x="242" y="212" width="190" height="72" rx="5" fill="rgba(249,226,175,0.04)" stroke="#3a2e00" stroke-width="1"/>
+      <text x="337" y="227" text-anchor="middle" fill="#f9e2af" font-size="9" font-family="Geist Mono,monospace">ns: staging</text>
+      <rect x="252" y="233" width="70" height="26" rx="4" fill="#0d1117" stroke="#1e2736" stroke-width="1"/>
+      <text x="287" y="250" text-anchor="middle" fill="#cdd6f4" font-size="9" font-family="Geist Mono,monospace">app pods</text>
+      <rect x="330" y="233" width="92" height="26" rx="4" fill="#0d1117" stroke="#1e2736" stroke-width="1"/>
+      <text x="376" y="250" text-anchor="middle" fill="#cdd6f4" font-size="9" font-family="Geist Mono,monospace">canary pods</text>
+
+      <!-- HPA / RBAC / Secrets -->
+      <rect x="50" y="294" width="130" height="26" rx="4" fill="#0d1117" stroke="#1e2736" stroke-width="1"/>
+      <text x="115" y="311" text-anchor="middle" fill="#6c7a99" font-size="9" font-family="Geist Mono,monospace">HPA + Autoscaler</text>
+      <rect x="190" y="294" width="96" height="26" rx="4" fill="#0d1117" stroke="#1e2736" stroke-width="1"/>
+      <text x="238" y="311" text-anchor="middle" fill="#6c7a99" font-size="9" font-family="Geist Mono,monospace">RBAC policies</text>
+      <rect x="296" y="294" width="96" height="26" rx="4" fill="#0d1117" stroke="#1e2736" stroke-width="1"/>
+      <text x="344" y="311" text-anchor="middle" fill="#6c7a99" font-size="9" font-family="Geist Mono,monospace">Secrets Mgr</text>
+
+      <!-- ALB Ingress -->
+      <rect x="50" y="332" width="110" height="30" rx="5" fill="#111a27" stroke="#89b4fa" stroke-width="1.2"/>
+      <text x="105" y="352" text-anchor="middle" fill="#89b4fa" font-size="9" font-family="Geist Mono,monospace" font-weight="600">ALB Ingress</text>
+
+      <!-- Istio -->
+      <rect x="172" y="332" width="90" height="30" rx="5" fill="#1a1120" stroke="#cba6f7" stroke-width="1.2"/>
+      <text x="217" y="352" text-anchor="middle" fill="#cba6f7" font-size="9" font-family="Geist Mono,monospace" font-weight="600">Istio mesh</text>
+
+      <!-- AWS Managed Services -->
+      <rect x="474" y="160" width="400" height="255" rx="8" fill="rgba(250,179,135,0.02)" stroke="#2a1800" stroke-width="1" stroke-dasharray="3,3"/>
+      <text x="674" y="178" text-anchor="middle" fill="#fab387" font-size="9" font-family="Geist Mono,monospace">AWS MANAGED SERVICES</text>
+
+      <!-- service boxes 2x4 -->
+      <!-- row 1 -->
+      <rect x="486" y="186" width="82" height="44" rx="5" fill="#0d1117" stroke="#1e2736" stroke-width="1"/>
+      <text x="527" y="205" text-anchor="middle" fill="#fab387" font-size="11" font-family="Geist Mono,monospace" font-weight="600">S3</text>
+      <text x="527" y="222" text-anchor="middle" fill="#45475a" font-size="8" font-family="Geist Mono,monospace">TF state + logs</text>
+
+      <rect x="578" y="186" width="82" height="44" rx="5" fill="#0d1117" stroke="#1e2736" stroke-width="1"/>
+      <text x="619" y="205" text-anchor="middle" fill="#fab387" font-size="11" font-family="Geist Mono,monospace" font-weight="600">RDS</text>
+      <text x="619" y="222" text-anchor="middle" fill="#45475a" font-size="8" font-family="Geist Mono,monospace">multi-AZ DB</text>
+
+      <rect x="670" y="186" width="82" height="44" rx="5" fill="#0d1117" stroke="#1e2736" stroke-width="1"/>
+      <text x="711" y="205" text-anchor="middle" fill="#fab387" font-size="11" font-family="Geist Mono,monospace" font-weight="600">IAM</text>
+      <text x="711" y="222" text-anchor="middle" fill="#45475a" font-size="8" font-family="Geist Mono,monospace">least-privilege</text>
+
+      <rect x="762" y="186" width="100" height="44" rx="5" fill="#0d1117" stroke="#1e2736" stroke-width="1"/>
+      <text x="812" y="202" text-anchor="middle" fill="#fab387" font-size="10" font-family="Geist Mono,monospace" font-weight="600">CloudWatch</text>
+      <text x="812" y="220" text-anchor="middle" fill="#45475a" font-size="8" font-family="Geist Mono,monospace">logs + metrics</text>
+
+      <!-- row 2 -->
+      <rect x="486" y="242" width="82" height="44" rx="5" fill="#0d1117" stroke="#1e2736" stroke-width="1"/>
+      <text x="527" y="260" text-anchor="middle" fill="#fab387" font-size="10" font-family="Geist Mono,monospace" font-weight="600">Route53</text>
+      <text x="527" y="277" text-anchor="middle" fill="#45475a" font-size="8" font-family="Geist Mono,monospace">DNS routing</text>
+
+      <rect x="578" y="242" width="82" height="44" rx="5" fill="#0d1117" stroke="#1e2736" stroke-width="1"/>
+      <text x="619" y="257" text-anchor="middle" fill="#fab387" font-size="9" font-family="Geist Mono,monospace" font-weight="600">Security</text>
+      <text x="619" y="269" text-anchor="middle" fill="#fab387" font-size="9" font-family="Geist Mono,monospace" font-weight="600">Groups</text>
+      <text x="619" y="282" text-anchor="middle" fill="#45475a" font-size="8" font-family="Geist Mono,monospace">firewall</text>
+
+      <rect x="670" y="242" width="82" height="44" rx="5" fill="#0d1117" stroke="#1e2736" stroke-width="1"/>
+      <text x="711" y="257" text-anchor="middle" fill="#fab387" font-size="9" font-family="Geist Mono,monospace" font-weight="600">Auto</text>
+      <text x="711" y="269" text-anchor="middle" fill="#fab387" font-size="9" font-family="Geist Mono,monospace" font-weight="600">Scaling</text>
+      <text x="711" y="282" text-anchor="middle" fill="#45475a" font-size="8" font-family="Geist Mono,monospace">EC2 + EKS</text>
+
+      <rect x="762" y="242" width="100" height="44" rx="5" fill="#0d1117" stroke="#1e2736" stroke-width="1"/>
+      <text x="812" y="260" text-anchor="middle" fill="#fab387" font-size="10" font-family="Geist Mono,monospace" font-weight="600">DynamoDB</text>
+      <text x="812" y="277" text-anchor="middle" fill="#45475a" font-size="8" font-family="Geist Mono,monospace">TF lock table</text>
+
+      <!-- multi-AZ -->
+      <rect x="486" y="300" width="376" height="102" rx="6" fill="rgba(166,227,161,0.03)" stroke="#1a3a20" stroke-width="1" stroke-dasharray="3,2"/>
+      <text x="674" y="316" text-anchor="middle" fill="#a6e3a1" font-size="8" font-family="Geist Mono,monospace" letter-spacing="1">MULTI-AZ DEPLOYMENT</text>
+      <rect x="496" y="323" width="110" height="28" rx="4" fill="#0d1117" stroke="#1e2736" stroke-width="1"/>
+      <text x="551" y="341" text-anchor="middle" fill="#45475a" font-size="8" font-family="Geist Mono,monospace">ap-south-1a</text>
+      <rect x="618" y="323" width="110" height="28" rx="4" fill="#0d1117" stroke="#1e2736" stroke-width="1"/>
+      <text x="673" y="341" text-anchor="middle" fill="#45475a" font-size="8" font-family="Geist Mono,monospace">ap-south-1b</text>
+      <rect x="740" y="323" width="112" height="28" rx="4" fill="#0d1117" stroke="#1e2736" stroke-width="1"/>
+      <text x="796" y="341" text-anchor="middle" fill="#45475a" font-size="8" font-family="Geist Mono,monospace">ap-south-1c (DR)</text>
+      <rect x="560" y="361" width="228" height="26" rx="4" fill="rgba(250,179,135,0.04)" stroke="#2a1800" stroke-width="1"/>
+      <text x="674" y="378" text-anchor="middle" fill="#fab387" font-size="8" font-family="Geist Mono,monospace">SNS · Lambda · SQS · WAF · Shield</text>
+
+      <!-- OBSERVABILITY zone -->
+      <rect x="10" y="428" width="875" height="118" rx="10" fill="rgba(203,166,247,0.03)" stroke="#2d1f4a" stroke-width="1.5" stroke-dasharray="5,4"/>
+      <text x="448" y="446" text-anchor="middle" fill="#cba6f7" font-size="10" font-family="Geist Mono,monospace" font-weight="600" letter-spacing="2">OBSERVABILITY STACK</text>
+
+      <!-- obs nodes -->
+      <rect x="22" y="454" width="106" height="80" rx="7" fill="#120d1e" stroke="#2d1f4a" stroke-width="1.2"/>
+      <text x="75" y="476" text-anchor="middle" fill="#cba6f7" font-size="10" font-family="Geist Mono,monospace" font-weight="600">Prometheus</text>
+      <text x="75" y="491" text-anchor="middle" fill="#45475a" font-size="8" font-family="Geist Mono,monospace">metrics scrape</text>
+      <text x="75" y="503" text-anchor="middle" fill="#45475a" font-size="8" font-family="Geist Mono,monospace">burn-rate alerts</text>
+
+      <rect x="138" y="454" width="100" height="80" rx="7" fill="#120d1e" stroke="#2d1f4a" stroke-width="1.2"/>
+      <text x="188" y="476" text-anchor="middle" fill="#cba6f7" font-size="10" font-family="Geist Mono,monospace" font-weight="600">Grafana</text>
+      <text x="188" y="491" text-anchor="middle" fill="#45475a" font-size="8" font-family="Geist Mono,monospace">SLO dashboards</text>
+      <text x="188" y="503" text-anchor="middle" fill="#45475a" font-size="8" font-family="Geist Mono,monospace">KPI tracking</text>
+
+      <rect x="248" y="454" width="110" height="80" rx="7" fill="#120d1e" stroke="#2d1f4a" stroke-width="1.2"/>
+      <text x="303" y="472" text-anchor="middle" fill="#cba6f7" font-size="10" font-family="Geist Mono,monospace" font-weight="600">Alertmanager</text>
+      <text x="303" y="487" text-anchor="middle" fill="#45475a" font-size="8" font-family="Geist Mono,monospace">PagerDuty routing</text>
+      <text x="303" y="499" text-anchor="middle" fill="#45475a" font-size="8" font-family="Geist Mono,monospace">runbook links</text>
+
+      <rect x="368" y="454" width="116" height="80" rx="7" fill="#120d1e" stroke="#2d1f4a" stroke-width="1.2"/>
+      <text x="426" y="472" text-anchor="middle" fill="#94e2d5" font-size="10" font-family="Geist Mono,monospace" font-weight="600">Distributed</text>
+      <text x="426" y="484" text-anchor="middle" fill="#94e2d5" font-size="10" font-family="Geist Mono,monospace" font-weight="600">Tracing</text>
+      <text x="426" y="499" text-anchor="middle" fill="#45475a" font-size="8" font-family="Geist Mono,monospace">Jaeger + OpenTelemetry</text>
+
+      <rect x="494" y="454" width="106" height="80" rx="7" fill="#120d1e" stroke="#2d1f4a" stroke-width="1.2"/>
+      <text x="547" y="472" text-anchor="middle" fill="#94e2d5" font-size="10" font-family="Geist Mono,monospace" font-weight="600">Log Aggregation</text>
+      <text x="547" y="487" text-anchor="middle" fill="#45475a" font-size="8" font-family="Geist Mono,monospace">Loki + Fluent Bit</text>
+      <text x="547" y="499" text-anchor="middle" fill="#45475a" font-size="8" font-family="Geist Mono,monospace">Elastic Stack</text>
+
+      <rect x="610" y="454" width="120" height="80" rx="7" fill="#120d1e" stroke="#2d1f4a" stroke-width="1.2"/>
+      <text x="670" y="472" text-anchor="middle" fill="#a6e3a1" font-size="10" font-family="Geist Mono,monospace" font-weight="600">SLI / SLO / SLA</text>
+      <text x="670" y="487" text-anchor="middle" fill="#45475a" font-size="8" font-family="Geist Mono,monospace">error budget tracking</text>
+      <text x="670" y="499" text-anchor="middle" fill="#45475a" font-size="8" font-family="Geist Mono,monospace">runbook automation</text>
+
+      <rect x="740" y="454" width="138" height="80" rx="7" fill="#120d1e" stroke="#2d1f4a" stroke-width="1.2"/>
+      <text x="809" y="472" text-anchor="middle" fill="#a6e3a1" font-size="10" font-family="Geist Mono,monospace" font-weight="600">On-Call + RCA</text>
+      <text x="809" y="487" text-anchor="middle" fill="#45475a" font-size="8" font-family="Geist Mono,monospace">incident lifecycle</text>
+      <text x="809" y="499" text-anchor="middle" fill="#45475a" font-size="8" font-family="Geist Mono,monospace">post-mortems</text>
+
+      <!-- ARROWS -->
+      <line x1="138" y1="63" x2="178" y2="63" stroke="#89b4fa" stroke-width="1.3" marker-end="url(#a1)" opacity=".7"/>
+      <line x1="260" y1="63" x2="272" y2="63" stroke="#89b4fa" stroke-width="1.3" marker-end="url(#a1)" opacity=".7"/>
+      <line x1="358" y1="63" x2="398" y2="63" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#a2)" opacity=".9"/>
+      <!-- Jenkins → ECR dashed -->
+      <line x1="358" y1="55" x2="496" y2="52" stroke="#89b4fa" stroke-width="1" marker-end="url(#a1)" opacity=".35" stroke-dasharray="3,2"/>
+      <!-- ArgoCD → EKS -->
+      <line x1="442" y1="90" x2="442" y2="178" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#a2)" opacity=".7"/>
+      <!-- Terraform → AWS -->
+      <line x1="669" y1="90" x2="669" y2="178" stroke="#cba6f7" stroke-width="1.2" marker-end="url(#a3)" opacity=".6"/>
+      <!-- EKS → Observability -->
+      <line x1="242" y1="390" x2="242" y2="450" stroke="#cba6f7" stroke-width="1" marker-end="url(#a3)" opacity=".5" stroke-dasharray="3,2"/>
+      <!-- Obs arrows -->
+      <line x1="128" y1="494" x2="136" y2="494" stroke="#cba6f7" stroke-width="1" marker-end="url(#a3)" opacity=".5"/>
+      <line x1="238" y1="494" x2="246" y2="494" stroke="#cba6f7" stroke-width="1" marker-end="url(#a3)" opacity=".5"/>
+    </svg>
+  </div>
+
+  <!-- STACK TABLE -->
+  <div class="sec-header" id="stack">
+    <span class="sec-num">03</span>
+    <span class="sec-title">Stack</span>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="stack-grid">
+    <div class="stack-row">
+      <div class="stack-cat">Cloud</div>
+      <div class="stack-val">
+        <span class="chip tag-orange">EC2</span><span class="chip tag-orange">EKS</span><span class="chip tag-orange">S3</span><span class="chip tag-orange">IAM</span><span class="chip tag-orange">VPC</span><span class="chip tag-orange">RDS</span><span class="chip tag-orange">Route53</span><span class="chip tag-orange">CloudWatch</span><span class="chip tag-orange">Lambda</span><span class="chip tag-orange">SNS</span>
+      </div>
+    </div>
+    <div class="stack-row">
+      <div class="stack-cat">IaC</div>
+      <div class="stack-val">
+        <span class="chip tag-purple">Terraform</span><span class="chip tag-purple">Ansible</span><span class="chip tag-blue">GitOps</span><span class="chip tag-blue">Drift Detection</span><span class="chip tag-blue">Remote State</span>
+      </div>
+    </div>
+    <div class="stack-row">
+      <div class="stack-cat">CI</div>
+      <div class="stack-val">
+        <span class="chip tag-blue">Jenkins</span><span class="chip tag-blue">GitHub Actions</span><span class="chip tag-blue">GitLab CI</span><span class="chip tag-yellow">Groovy scripting</span><span class="chip tag-green">Quality Gates</span>
+      </div>
+    </div>
+    <div class="stack-row">
+      <div class="stack-cat">CD</div>
+      <div class="stack-val">
+        <span class="chip tag-green">ArgoCD</span><span class="chip tag-green">App-of-Apps</span><span class="chip tag-green">Blue-Green</span><span class="chip tag-green">Canary</span><span class="chip tag-green">Rollback Automation</span>
+      </div>
+    </div>
+    <div class="stack-row">
+      <div class="stack-cat">Containers</div>
+      <div class="stack-val">
+        <span class="chip tag-teal">Kubernetes (EKS)</span><span class="chip tag-teal">Docker</span><span class="chip tag-teal">Helm</span><span class="chip tag-purple">Istio</span><span class="chip tag-teal">StatefulSets</span><span class="chip tag-teal">DaemonSets</span>
+      </div>
+    </div>
+    <div class="stack-row">
+      <div class="stack-cat">Observability</div>
+      <div class="stack-val">
+        <span class="chip tag-purple">Prometheus</span><span class="chip tag-purple">Grafana</span><span class="chip tag-purple">Alertmanager</span><span class="chip tag-teal">Jaeger</span><span class="chip tag-teal">OpenTelemetry</span><span class="chip tag-blue">Loki</span><span class="chip tag-blue">Fluent Bit</span>
+      </div>
+    </div>
+    <div class="stack-row">
+      <div class="stack-cat">Security</div>
+      <div class="stack-val">
+        <span class="chip tag-green">RBAC</span><span class="chip tag-green">IAM Least-Privilege</span><span class="chip tag-green">Trivy scanning</span><span class="chip tag-green">Secrets Manager</span><span class="chip tag-green">DevSecOps gates</span>
+      </div>
+    </div>
+    <div class="stack-row">
+      <div class="stack-cat">Scripting</div>
+      <div class="stack-val">
+        <span class="chip tag-yellow">Python</span><span class="chip tag-yellow">Bash</span><span class="chip tag-yellow">Groovy</span><span class="chip tag-blue">REST API</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILE STRUCTURE -->
+  <div class="sec-header" id="structure">
+    <span class="sec-num">04</span>
+    <span class="sec-title">Project Structure</span>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="tree-wrap">
+    <div class="tree-header">
+      <div class="tree-dot td-red"></div>
+      <div class="tree-dot td-yellow"></div>
+      <div class="tree-dot td-green"></div>
+      <span style="margin-left:6px">cloud-native-devops-platform/</span>
+    </div>
+    <div class="tree-body">
+<pre style="background:transparent;border:none;padding:0;font-size:12.5px;line-height:2"><span class="t-root">cloud-native-devops-platform/</span>
+<span class="t-arrow">├──</span> <span class="t-dir">terraform/</span>                    <span class="t-cmt"># Infrastructure as Code</span>
+<span class="t-arrow">│   ├──</span> <span class="t-dir">modules/</span>
+<span class="t-arrow">│   │   ├──</span> <span class="t-dir">vpc/</span>                  <span class="t-cmt"># VPC, subnets, route tables, IGW</span>
+<span class="t-arrow">│   │   ├──</span> <span class="t-dir">eks/</span>                  <span class="t-cmt"># EKS cluster, node groups, OIDC</span>
+<span class="t-arrow">│   │   ├──</span> <span class="t-dir">iam/</span>                  <span class="t-cmt"># Roles, policies, least-privilege</span>
+<span class="t-arrow">│   │   ├──</span> <span class="t-dir">rds/</span>                  <span class="t-cmt"># Multi-AZ RDS instances</span>
+<span class="t-arrow">│   │   └──</span> <span class="t-dir">security/</span>             <span class="t-cmt"># Security groups, NACLs</span>
+<span class="t-arrow">│   ├──</span> <span class="t-dir">environments/</span>
+<span class="t-arrow">│   │   ├──</span> <span class="t-dir">dev/</span>                  <span class="t-cmt"># terraform.tfvars + main.tf</span>
+<span class="t-arrow">│   │   ├──</span> <span class="t-dir">staging/</span>
+<span class="t-arrow">│   │   └──</span> <span class="t-dir">prod/</span>
+<span class="t-arrow">│   └──</span> <span class="t-file">backend.tf</span>                <span class="t-cmt"># S3 + DynamoDB state locking</span>
+<span class="t-arrow">│</span>
+<span class="t-arrow">├──</span> <span class="t-dir">.github/workflows/</span>             <span class="t-cmt"># GitHub Actions CI</span>
+<span class="t-arrow">│   ├──</span> <span class="t-new">ci-pipeline.yml</span>           <span class="t-cmt"># build → test → scan → push ECR</span>
+<span class="t-arrow">│   └──</span> <span class="t-new">tf-plan-apply.yml</span>         <span class="t-cmt"># Terraform plan on PR, apply on merge</span>
+<span class="t-arrow">│</span>
+<span class="t-arrow">├──</span> <span class="t-dir">k8s/</span>                            <span class="t-cmt"># Kubernetes manifests</span>
+<span class="t-arrow">│   ├──</span> <span class="t-dir">base/</span>                     <span class="t-cmt"># Deployments, Services, Ingress</span>
+<span class="t-arrow">│   ├──</span> <span class="t-dir">overlays/</span>                 <span class="t-cmt"># Kustomize env-specific patches</span>
+<span class="t-arrow">│   └──</span> <span class="t-dir">helm-charts/</span>              <span class="t-cmt"># App Helm charts</span>
+<span class="t-arrow">│</span>
+<span class="t-arrow">├──</span> <span class="t-dir">argocd/</span>                         <span class="t-cmt"># GitOps config</span>
+<span class="t-arrow">│   ├──</span> <span class="t-new">application.yaml</span>          <span class="t-cmt"># ArgoCD Application CRD</span>
+<span class="t-arrow">│   └──</span> <span class="t-new">app-of-apps.yaml</span>          <span class="t-cmt"># App-of-apps pattern</span>
+<span class="t-arrow">│</span>
+<span class="t-arrow">├──</span> <span class="t-dir">observability/</span>                  <span class="t-cmt"># Monitoring stack</span>
+<span class="t-arrow">│   ├──</span> <span class="t-dir">prometheus/</span>
+<span class="t-arrow">│   │   ├──</span> <span class="t-new">alerting-rules.yml</span>    <span class="t-cmt"># Burn-rate SLO alerts</span>
+<span class="t-arrow">│   │   └──</span> <span class="t-new">recording-rules.yml</span>
+<span class="t-arrow">│   ├──</span> <span class="t-dir">grafana/dashboards/</span>       <span class="t-cmt"># JSON dashboard definitions</span>
+<span class="t-arrow">│   └──</span> <span class="t-dir">runbooks/</span>                 <span class="t-cmt"># One-page incident runbooks</span>
+<span class="t-arrow">│</span>
+<span class="t-arrow">└──</span> <span class="t-dir">scripts/</span>                        <span class="t-cmt"># Python + Bash automation</span>
+    <span class="t-arrow">├──</span> <span class="t-new">bootstrap.sh</span>              <span class="t-cmt"># Full platform setup from scratch</span>
+    └── <span class="t-new">drift-check.py</span>            <span class="t-cmt"># Terraform drift detection</span></pre>
+    </div>
+  </div>
+
+  <!-- QUICK START -->
+  <div class="sec-header" id="quickstart">
+    <span class="sec-num">05</span>
+    <span class="sec-title">Quick Start</span>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-bar">
+      <span>bash — run from repo root</span>
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    </div>
+    <pre id="qsCode"><span class="cm"># 1. Clone the repo</span>
+<span class="gt">git</span> clone https://github.com/iamitabh07/cloud-native-devops-platform
+<span class="gt">cd</span> cloud-native-devops-platform
+
+<span class="cm"># 2. Configure AWS credentials</span>
+<span class="kw">export</span> <span class="nm">AWS_PROFILE</span>=devops-platform
+
+<span class="cm"># 3. Bootstrap infrastructure (dev environment)</span>
+<span class="gt">cd</span> terraform/environments/dev
+<span class="gt">terraform</span> init
+<span class="gt">terraform</span> plan -out=tfplan
+<span class="gt">terraform</span> apply tfplan
+
+<span class="cm"># 4. Configure kubectl</span>
+<span class="gt">aws</span> eks update-kubeconfig --region ap-south-1 --name devops-platform-dev
+
+<span class="cm"># 5. Deploy ArgoCD + bootstrap app-of-apps</span>
+<span class="gt">kubectl</span> apply -f argocd/application.yaml
+<span class="gt">kubectl</span> apply -f argocd/app-of-apps.yaml
+
+<span class="cm"># 6. Access Grafana dashboards</span>
+<span class="gt">kubectl</span> port-forward svc/grafana 3000:80 -n monitoring
+<span class="cm"># → Open http://localhost:3000</span></pre>
+  </div>
+
+  <!-- PROMETHEUS ALERTING -->
+  <div class="sec-header">
+    <span class="sec-num">06</span>
+    <span class="sec-title">Observability: Burn-Rate Alerting</span>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="code-wrap" style="margin-bottom:80px">
+    <div class="code-bar">
+      <span>observability/prometheus/alerting-rules.yml</span>
+      <button class="copy-btn" onclick="copyCode2(this)">Copy</button>
+    </div>
+    <pre id="promCode"><span class="nm">groups</span>:
+  - <span class="nm">name</span>: <span class="str">slo_burn_rate_alerts</span>
+    <span class="nm">rules</span>:
+
+    - <span class="nm">alert</span>: <span class="fn">HighErrorBurnRate_Critical</span>
+      <span class="nm">expr</span>: |
+        <span class="fn">sum</span>(<span class="fn">rate</span>(http_requests_total{<span class="nm">status</span>=~<span class="str">"5.."</span>}[<span class="nu">5m</span>]))
+        / <span class="fn">sum</span>(<span class="fn">rate</span>(http_requests_total[<span class="nu">5m</span>])) > <span class="nu">0.14</span>
+      <span class="nm">for</span>: <span class="nu">2m</span>
+      <span class="nm">labels</span>:
+        <span class="nm">severity</span>: <span class="str">critical</span>
+        <span class="nm">slo</span>: <span class="str">error_rate</span>
+      <span class="nm">annotations</span>:
+        <span class="nm">summary</span>: <span class="str">"CRITICAL — Error rate burning SLO budget fast"</span>
+        <span class="nm">runbook_url</span>: <span class="str">"https://runbooks.internal/high-error-rate"</span>
+        <span class="nm">first_steps</span>: |
+          <span class="cm"># 1. Check recent deployments</span>
+          kubectl rollout history deploy/{{ $labels.service }}
+          <span class="cm"># 2. Tail error logs</span>
+          kubectl logs -l app={{ $labels.service }} --tail=50
+          <span class="cm"># 3. Check downstream deps</span>
+          curl -s http://healthcheck/{{ $labels.service }}/deps
+
+    - <span class="nm">alert</span>: <span class="fn">HighErrorBurnRate_Warning</span>
+      <span class="nm">expr</span>: |
+        <span class="fn">sum</span>(<span class="fn">rate</span>(http_requests_total{<span class="nm">status</span>=~<span class="str">"5.."</span>}[<span class="nu">30m</span>]))
+        / <span class="fn">sum</span>(<span class="fn">rate</span>(http_requests_total[<span class="nu">30m</span>])) > <span class="nu">0.05</span>
+      <span class="nm">for</span>: <span class="nu">15m</span>
+      <span class="nm">labels</span>:
+        <span class="nm">severity</span>: <span class="str">warning</span>
+      <span class="nm">annotations</span>:
+        <span class="nm">summary</span>: <span class="str">"WARNING — Slow error budget burn detected"</span>
+        <span class="nm">first_steps</span>: <span class="str">"Check Grafana SLO dashboard — link in runbook"</span></pre>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-name">Amitabh Das</div>
+      <div style="font-size:12px;color:var(--dim);margin-top:3px;font-family:'Geist Mono',monospace">DevOps Engineer II · Capgemini Engineering · Gurugram</div>
+    </div>
+    <div class="footer-links">
+      <a href="https://linkedin.com/in/iamitabh07">LinkedIn</a>
+      <a href="https://github.com/iamitabh07">GitHub</a>
+      <a href="mailto:amitabhdas7898@gmail.com">Email</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+function copyCode(btn) {
+  const text = document.getElementById('qsCode').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!'; btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('ok'); }, 2000);
+  });
+}
+function copyCode2(btn) {
+  const text = document.getElementById('promCode').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!'; btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('ok'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>
