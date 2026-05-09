@@ -1,0 +1,31 @@
+observability/prometheus/alerting-rules.yml
+0.14\n for: 2m\n labels:\n severity: critical\n slo: error_rate\n annotations:\n summary: \"CRITICAL — Error rate burning SLO budget fast\"\n runbook_url: \"https://runbooks.internal/high-error-rate\"\n - alert: HighErrorBurnRate_Warning\n expr: |\n sum(rate(http_requests_total{status=~\"5..\"}[30m]))\n / sum(rate(http_requests_total[30m])) > 0.05\n for: 15m\n labels:\n severity: warning\n annotations:\n summary: \"WARNING — Slow error budget burn detected\"`)">Copy
+
+groups:
+  - name: slo_burn_rate_alerts
+    rules:
+
+    - alert: HighErrorBurnRate_Critical
+      expr: |
+        sum(rate(http_requests_total{status=~"5.."}[5m]))
+        / sum(rate(http_requests_total[5m])) > 0.14
+      for: 2m
+      labels:
+        severity: critical
+        slo: error_rate
+      annotations:
+        summary: "CRITICAL — Error rate burning SLO budget fast"
+        runbook_url: "https://runbooks.internal/high-error-rate"
+        first_steps: |
+          kubectl rollout history deploy/{{ $labels.service }}
+          kubectl logs -l app={{ $labels.service }} --tail=50
+
+    - alert: HighErrorBurnRate_Warning
+      expr: |
+        sum(rate(http_requests_total{status=~"5.."}[30m]))
+        / sum(rate(http_requests_total[30m])) > 0.05
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "WARNING — Slow error budget burn detected"
