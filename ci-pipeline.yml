@@ -1,0 +1,53 @@
+name: CI Pipeline — Build · Scan · Deploy
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  AWS_REGION: ap-south-1
+  ECR_REPOSITORY: devops-platform-app
+
+jobs:
+  build-and-scan:
+    name: Build · Trivy Scan · Push ECR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Build Docker image
+        run: docker build -t $ECR_REPOSITORY:${{ github.sha }} .
+
+      - name: Trivy vulnerability scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          format: table
+          exit-code: 1
+          severity: CRITICAL
+
+      - name: Push to ECR
+        run: |
+          aws ecr get-login-password | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+          docker push ${{ secrets.ECR_REGISTRY }}/$ECR_REPOSITORY:${{ github.sha }}
+
+  terraform-plan:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - run: terraform init
+        working-directory: ./terraform/environments/dev
+      - run: terraform plan -no-color
+        working-directory: ./terraform/environments/dev
